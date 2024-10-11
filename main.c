@@ -27,7 +27,15 @@ int main()
 	// read sensor data and write to file
 	for (int i = 0; i < 100; i++) {
 		float temperature = bmp180_temperature(bmp180);
+		if (temperature <= -50.0 || temperature >= 50) {
+			printf("Temperature out of bounds\n");
+			return 1;
+		}
 		float pressure = bmp180_pressure(bmp180) / 100;
+		if (pressure <= 800 || pressure >= 1200) {
+			printf("Pressure out of bounds\n");
+			return 1;
+		}
 		time(&rawtime);
 		timeinfo = localtime(&rawtime);
 		//printf("%sTemperature = %.1f °C, Pressure = %.1f hPa\n\n", asctime(timeinfo), temperature, pressure);
