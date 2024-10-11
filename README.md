@@ -32,12 +32,12 @@ You can check if the 1 Mb RAM drive has been succesfully created by typing ```df
 ## Connection sensor
 To connect the BMP180 sensor to the Raspberry Pi:
 - BMP180 ----- RPi
-- Vin -------- 3.3V
-- GND -------- GND
-- SDA -------- SDA (GPIO 2)
-- SCL -------- SCL (GPIO 3)
+- Vin ----------- 3.3V
+- GND --------- GND
+- SDA ---------- SDA (GPIO 2)
+- SCL ----------- SCL (GPIO 3)
 
-##Building project
+## Building project
 First you'll need to clone the repo by using git clone.
 ```
 git clone https://github.com/DamianMoris0/StageOpdracht.git
