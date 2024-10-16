@@ -45,3 +45,27 @@ git clone https://github.com/DamianMoris0/StageOpdracht.git
 To build application navigate into the cloned repo and type ```make```, this should succesfully build the application.
 And finally execute the code by running ```./main.o```.
 The application should now run and write the read data into a data.json file located in /var/data.
+
+## Run on boot
+If you want the code to run constantly without having to start the program manually you'll need to follow the follwing steps.
+You do have to build the code manually once though, so that the deamon service knows which executable to run.
+To start navigate to the /etc/systemd/system folder from your root directory, here you'll need to create a new .service file called "sensor-service.service" (make sure to use admin privileges for this).
+In this file you should enter the following structure.
+```
+[Unit]
+Description=Sensor Service
+
+[Service]
+Type=simple
+RemainAfterExit=yes
+ExecStart=/home/pi/Sensor/main.o
+Restart=on-success
+User=pi
+WorkingDirectory=/home/pi/Sensor
+
+[Install]
+WantedBy=multi-user.target
+```
+Now run ```systemctl daemon-reload``` to reload the service.
+If you run ```sudo systemctl enable sensor-service.service``` your code will now run at boot.
+This can be disabled by running ```sudo systemctl disable sensor-service.service```.
