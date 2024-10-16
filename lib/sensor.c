@@ -9,10 +9,12 @@ int initSensor(void *sensor)
     bmp180_eprom_t eprom;
 	bmp180_dump_eprom(sensor, &eprom);
 	bmp180_set_oss(sensor, 1);
+
 	if (sensor == NULL) {
 		printf("Unable to detect sensor\n");
 		return 1;
 	}
+
     return 0;
 }
 
@@ -27,6 +29,19 @@ int writeSensorDataToFile(FILE **dataFile, float *temp, float *pres, struct tm *
 	fprintf(*dataFile, "{\"timestamp\":\"%s\",", editedTime);
 	fprintf(*dataFile, "\"temperature\":%.1f,", *temp);
 	fprintf(*dataFile, "\"pressure\":%.1f}\n", *pres);
+
+	return 0;
+}
+
+int checkDataBounds(float temp, float pres)
+{
+	if (temp <= -50 || temp >= 50) {
+		return 1;
+	}
+
+	if (pres <= 800 || pres >= 1200) {
+		return 1;
+	}
 
 	return 0;
 }

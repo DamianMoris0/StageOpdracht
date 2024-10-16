@@ -3,3 +3,4 @@
 
 int initSensor(void *sensor);
 int writeSensorDataToFile(FILE **dataFile, float *temp, float *pres, struct tm *time);
+int checkDataBounds(float temp, float pres);
