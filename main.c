@@ -9,13 +9,13 @@ int main()
 	// initialise variables
 	char *i2c = "/dev/i2c-1";
 	int addr = 0x77;
-	void *bmp180 = bmp180_init(addr, i2c);
+	void *sensor = bmp180_init(addr, i2c);
 	time_t rawtime;
 	struct tm *timeinfo;
 	FILE *sensorDataFile;
 
-	// initialise bmp180
-	initSensor(&bmp180);
+	// initialise sensor
+	initSensor(&sensor, BMP180);
 
 	// open data.json file
 	sensorDataFile = fopen("/var/data/data.json", "w");
@@ -26,8 +26,8 @@ int main()
 
 	// read sensor data and write to file
 	for (int i = 0; i < 100; i++) {		// this will become an infinite loop when database structure is finished
-		float temperature = bmp180_temperature(bmp180);
-		float pressure = bmp180_pressure(bmp180) / 100;
+		float temperature = bmp180_temperature(sensor);
+		float pressure = bmp180_pressure(sensor) / 100;
 		checkDataBounds(temperature, pressure);	// if temperature or pressure are out of bounds return 1
 		time(&rawtime);
 		timeinfo = localtime(&rawtime);
@@ -38,7 +38,7 @@ int main()
 
 	// close file and bmp180
 	fclose(sensorDataFile);
-	bmp180_close(bmp180);
+	bmp180_close(sensor);
 
 	return 0;
 }

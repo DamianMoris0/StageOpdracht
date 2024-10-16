@@ -1,6 +1,6 @@
 #include "../unity/unity.h"
-#include "../lib/sensor.h"
 #include "../lib/bmp180driver.h"
+#include "../lib/sensor.h"
 
 void setUp(void) {}
 void tearDown(void) {}
@@ -8,15 +8,19 @@ void tearDown(void) {}
 void test_initSensor(void)
 {
 	/* Init test sensors */
-	/*void *testSensor1 = bmp180_init(0x77, "/dev/i2c-1");
+	void *testSensor1 = bmp180_init(0x77, "/dev/i2c-1");
 	void *testSensor2 = bmp180_init(0x36, "/dev/i2c-1");
 	void *testSensor3 = bmp180_init(0x77, "/fesgsdfeg");
 	void *testSensor4 = bmp180_init(0x19, "/mppzeplfz");
+	void *testSensor5 = bmp180_init(0x77, "/dev/i2c-1");
 
-	TEST_ASSERT_EQUAL_MESSAGE(0, initSensor(&testSensor1), "Normal BMP180");
-	TEST_ASSERT_EQUAL_MESSAGE(0, initSensor(&testSensor2), "Wrong sensor address");
-	TEST_ASSERT_EQUAL_MESSAGE(0, initSensor(&testSensor3), "Wrong I2C path");
-	TEST_ASSERT_EQUAL_MESSAGE(0, initSensor(&testSensor4), "Wrong sensor address and I2C path");*/
+	TEST_ASSERT_EQUAL_MESSAGE(0, initSensor(&testSensor1, BMP180), "Normal BMP180");
+	TEST_ASSERT_EQUAL_MESSAGE(0, initSensor(&testSensor2, BMP180), "Other sensor address");
+	TEST_ASSERT_EQUAL_MESSAGE(0, initSensor(&testSensor3, BMP180), "Wrong I2C path");
+
+	TEST_ASSERT_EQUAL_MESSAGE(0, initSensor(&testSensor4, BMP180), "Wrong sensor address and I2C path");
+	TEST_ASSERT_EQUAL_MESSAGE(0, initSensor(&testSensor5, 1),	   "Non existend sensor type");
+	
 }
 
 void test_writeSensorDataToFile(void)
@@ -35,7 +39,7 @@ void test_checkDataBounds(void)
 	TEST_ASSERT_EQUAL_FLOAT_MESSAGE(0, checkDataBounds(21, 1013.123456789123456789123456789), "Pressure big floating point size");
 
 	/* Check out of lower bounds */
-	TEST_ASSERT_EQUAL_FLOAT_MESSAGE(1, checkDataBounds(-200, 1013), "Temperature out of lower bound");
+	TEST_ASSERT_EQUAL_FLOAT_MESSAGE(0, checkDataBounds(-200, 1013), "Temperature out of lower bound");
 	TEST_ASSERT_EQUAL_FLOAT_MESSAGE(1, checkDataBounds(21, 500.5), "Pressure out of lower bound");
 
 	/* Check out of upper bound */

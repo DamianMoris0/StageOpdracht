@@ -4,13 +4,21 @@
 #include <string.h>
 #include <time.h>
 
-int initSensor(void *sensor)
+int initSensor(void *sens, int TYPE)
 {
-    bmp180_eprom_t eprom;
-	bmp180_dump_eprom(sensor, &eprom);
-	bmp180_set_oss(sensor, 1);
+	if (TYPE == BMP180) {
+		bmp180_eprom_t eprom;
+		bmp180_dump_eprom(sens, &eprom);
+		bmp180_set_oss(sens, 1);
+	}
+	else {
+		return 1;
+		/*bmp180_eprom_t eprom;
+		bmp180_dump_eprom(sens, &eprom);
+		bmp180_set_oss(sens, 1);*/
+	}
 
-	if (sensor == NULL) {
+	if (sens == NULL) {
 		printf("Unable to detect sensor\n");
 		return 1;
 	}
