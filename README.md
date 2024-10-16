@@ -45,3 +45,7 @@ git clone https://github.com/DamianMoris0/StageOpdracht.git
 To build application navigate into the cloned repo and type ```make```, this should succesfully build the application.
 And finally execute the code by running ```./main.o```.
 The application should now run and write the read data into a data.json file located in /var/data.
+
+## Run on boot
+If you want the code to run constantly without having to start the program manually you'll need to follow the follwing steps.
+You do have to build the code manually once though, so that the deamon service knows which executable to run.
