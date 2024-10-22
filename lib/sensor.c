@@ -13,6 +13,7 @@ int initSensor(void *sens, int TYPE)
 	}
 	else {
 		return 1;
+		/* Default to BMP180 sensor */
 		/*bmp180_eprom_t eprom;
 		bmp180_dump_eprom(sens, &eprom);
 		bmp180_set_oss(sens, 1);*/

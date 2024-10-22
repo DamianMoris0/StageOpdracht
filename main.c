@@ -25,15 +25,15 @@ int main()
 	}
 
 	// read sensor data and write to file
-	for (int i = 0; i < 100; i++) {		// this will become an infinite loop when database structure is finished
+	for (int i = 0; i < 100; i++) {							// this will become an infinite loop when database structure is finished
 		float temperature = bmp180_temperature(sensor);
-		float pressure = bmp180_pressure(sensor) / 100;
-		checkDataBounds(temperature, pressure);	// if temperature or pressure are out of bounds return 1
-		time(&rawtime);
+		float pressure = bmp180_pressure(sensor) / 100; 	// divide by 100 to get hPa
+		checkDataBounds(temperature, pressure);				// if temperature or pressure are out of bounds return 1
+		time(&rawtime);										// get raw time date to later convert into date-time format
 		timeinfo = localtime(&rawtime);
 		//printf("%sTemperature = %.1f °C, Pressure = %.1f hPa\n\n", asctime(timeinfo), temperature, pressure);
 		writeSensorDataToFile(&sensorDataFile, &temperature, &pressure, timeinfo);
-		usleep(100000); // in µs
+		usleep(100000); // time in µs
 	}
 
 	// close file and bmp180
