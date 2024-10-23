@@ -2,8 +2,11 @@
 
 ## Intro
 In this repo you will find code to read temperature and pressure data from a BMP180 sensor with a Raspberry Pi Zero 2 W and save it in RAM memory in a JSON file.
+This code will also be unit tested using [Unity](https://github.com/ThrowTheSwitch/Unity/tree/master).
 
 ## Dependencies install
+
+### I²C
 You will need to install some packages on your device for the I²C communication to work properly.
 By typing the following commands in the terminal.
 ```
@@ -29,6 +32,10 @@ sudo mount -a
 ```
 You can check if the 1 Mb RAM drive has been succesfully created by typing ```df```, if a 1024 Kb drive shows up with the name /var/data, it has succesfuly been created and data can be written to it.
 
+### MQTT
+For the MQTT communication this project will use the Paho MQTT C client library from Eclipse.
+To install the needed MQTT library you can follow the instructions on the [paho.mqtt.c](https://github.com/eclipse/paho.mqtt.c) repo.
+
 ## Connection sensor
 To connect the BMP180 sensor to the Raspberry Pi:
 - BMP180 ----- RPi
@@ -36,6 +43,19 @@ To connect the BMP180 sensor to the Raspberry Pi:
 - GND --------- GND
 - SDA ---------- SDA (GPIO 2)
 - SCL ----------- SCL (GPIO 3)
+
+## Generate TLS/SSL certificates
+To get the required certificates run the following commands one by one.
+After running the last command it will prompt you for a password, you can choose this password yourself but you have to remember it for later and enter it when prompted.
+```
+openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365
+cat key.pem cert.pem > combined.pem
+openssl pkcs12 -export -in combined.pem -out keystore.p12 -name default -noiter -nomaciter
+```
+To generate the fingerprint ot input into the Azure Iot Hub run.
+```
+openssl x509 -in cert.pem -noout -fingerprint|tr -d ':'|cut -f2 -d=
+```
 
 ## Building project
 First you'll need to clone the repo by using git clone.
