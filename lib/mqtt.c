@@ -40,7 +40,7 @@ void configSSL(MQTTClient_SSLOptions *ssl_opts, MQTTClient_connectOptions *conn_
     conn_opts->keepAliveInterval = 20;
     conn_opts->cleansession = 1;
     conn_opts->ssl = ssl_opts;
-    conn_opts->username = "IotHubStage.azure-devices.net/RaspberryPi/?api-version=2021-04-12";
+    conn_opts->username = USERNAME;
 }
 
 int connectBroker(MQTTClient handle, MQTTClient_connectOptions *conn_opts)

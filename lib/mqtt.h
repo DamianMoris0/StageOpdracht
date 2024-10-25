@@ -1,8 +1,9 @@
 #include "MQTTClient.h"
 
-#define ADDRESS     "ssl://IotHubStage.azure-devices.net:8883"  // Broker address with SSL
+#define ADDRESS     "mqtt-dashboard.com"//"ssl://IotHubStage.azure-devices.net:8883"  // Broker address with SSL
 #define CLIENTID    "RaspberryPi"                               // Client ID for your MQTT client
-#define TOPIC       "devices/RaspberryPi/messages/events/"      // Change to your topic
+#define TOPIC       "testtopic/"//"devices/RaspberryPi/messages/events/"      // Change to your topic
+#define USERNAME    "stage"//"IotHubStage.azure-devices.net/RaspberryPi/?api-version=2021-04-12"
 #define QOS         1
 #define TIMEOUT     10000L
 
