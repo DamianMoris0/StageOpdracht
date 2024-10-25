@@ -44,10 +44,15 @@ int main()
 	}
 
 	/* Read sensor data and write to file */
-	for (int i = 0; i < 10; i++) {											// This will become an infinite loop when database structure is finished
+	int loopAmount = SEND_DATA_INTERVAL / SAMPLE_TIME; 			// Specifies the amount of loops needed to send full json data file every SEND_DATA_INTERVAL seconds, with data samples every SAMPLE_TIME seconds
+	for (int i = 0; i < loopAmount; i++) {
 		sensorValues.temperature = bmp180_temperature(sensor);
-		sensorValues.pressure = bmp180_pressure(sensor) / 100; 				// Divide by 100 to get hPa
-		checkDataBounds(sensorValues.temperature, sensorValues.pressure);	// If temperature or pressure are out of bounds return 1
+		sensorValues.pressure = bmp180_pressure(sensor) / 100; 	// Divide by 100 to get hPa
+		if (checkDataBounds(sensorValues.temperature, sensorValues.pressure)) {
+			printf("Sensor data out of bounds\n");
+			i--; 												// Decrement i and continue to read again, so json file will be the same size
+			continue;
+		}
 
 		/* Get raw time and convert to readable time and remove '\n' from last char in array */
 		time(&rawtime);
@@ -56,7 +61,7 @@ int main()
 		sensorValues.time[strlen(sensorValues.time) - 1] = '\0';
 
 		writeSensorDataToFile(&sensorDataFile, &sensorValues);
-		usleep(100000); 													// Time in µs
+		usleep(SAMPLE_TIME); 									// Time in µs
 	}
 
 	/* Close file and bmp180 */
