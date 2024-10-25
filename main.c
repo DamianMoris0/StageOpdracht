@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>
+#include <string.h>
 #include "MQTTClient.h"
 #include "lib/bmp180driver.h"
 #include "lib/sensor.h"
@@ -15,14 +16,17 @@ int main()
 	time_t rawtime;
 	struct tm *timeinfo;
 	FILE *sensorDataFile;
+	struct SensorValues sensorValues;
+	sensorValues.type = BMP180;
+	sensorValues.id = "Sensor_1";
 
 	/* MQTT variables */
 	MQTTClient client;
     MQTTClient_SSLOptions sslOptions = MQTTClient_SSLOptions_initializer;
     MQTTClient_connectOptions connectOptions = MQTTClient_connectOptions_initializer;
-    char *payloadMessage = "Insert json data here";
+    char *payloadMessage = "{\"sensorID\":\"Sensor_1\",\"timestamp\":\"Thu Oct 24 16:59:29 2024\",\"temperature\":18.3,\"pressure\":1006.0}";
 
-	/* MQTT */
+	/* MQTT client x broker config & connection*/
     MQTTClient_create(&client, ADDRESS, CLIENTID, MQTTCLIENT_PERSISTENCE_NONE, NULL); 	// Create the MQTT client
     MQTTClient_setCallbacks(client, NULL, connlost, msgarrvd, delivered); 				// Set the MQTT client callback functions
     configSSL(&sslOptions, &connectOptions); 											// Configure SSL options
@@ -30,7 +34,7 @@ int main()
     publishMessage(client, payloadMessage); 											// Publish a message
 
 	/* Initialise sensor */
-	initSensor(&sensor, BMP180);
+	initSensor(&sensor, sensorValues.type);
 
 	/* Open data.json file */
 	sensorDataFile = fopen("/var/data/data.json", "w");
@@ -40,14 +44,19 @@ int main()
 	}
 
 	/* Read sensor data and write to file */
-	for (int i = 0; i < 10; i++) {							// This will become an infinite loop when database structure is finished
-		float temperature = bmp180_temperature(sensor);
-		float pressure = bmp180_pressure(sensor) / 100; 	// Divide by 100 to get hPa
-		checkDataBounds(temperature, pressure);				// If temperature or pressure are out of bounds return 1
-		time(&rawtime);										// Get raw time date to later convert into date-time format
+	for (int i = 0; i < 10; i++) {											// This will become an infinite loop when database structure is finished
+		sensorValues.temperature = bmp180_temperature(sensor);
+		sensorValues.pressure = bmp180_pressure(sensor) / 100; 				// Divide by 100 to get hPa
+		checkDataBounds(sensorValues.temperature, sensorValues.pressure);	// If temperature or pressure are out of bounds return 1
+
+		/* Get raw time and convert to readable time and remove '\n' from last char in array */
+		time(&rawtime);
 		timeinfo = localtime(&rawtime);
-		writeSensorDataToFile(&sensorDataFile, &temperature, &pressure, timeinfo);
-		usleep(100000); 									// Time in µs
+		sensorValues.time = asctime(timeinfo);
+		sensorValues.time[strlen(sensorValues.time) - 1] = '\0';
+
+		writeSensorDataToFile(&sensorDataFile, &sensorValues);
+		usleep(100000); 													// Time in µs
 	}
 
 	/* Close file and bmp180 */

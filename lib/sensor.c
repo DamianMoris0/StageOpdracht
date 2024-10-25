@@ -1,12 +1,16 @@
 #include "bmp180driver.h"
 #include "sensor.h"
 #include <stdio.h>
-#include <string.h>
 #include <time.h>
 
-int initSensor(void *sens, int TYPE)
+int initSensor(void *sens, int type)
 {
-	if (TYPE == BMP180) {
+	if (sens == NULL) {
+		printf("Unable to detect sensor\n");
+		return 1;
+	}
+
+	if (type == BMP180) {
 		bmp180_eprom_t eprom;
 		bmp180_dump_eprom(sens, &eprom);
 		bmp180_set_oss(sens, 1);
@@ -14,30 +18,21 @@ int initSensor(void *sens, int TYPE)
 	else {
 		return 1;
 		/* Default to BMP180 sensor */
-		/*bmp180_eprom_t eprom;
-		bmp180_dump_eprom(sens, &eprom);
-		bmp180_set_oss(sens, 1);*/
-	}
-
-	if (sens == NULL) {
-		printf("Unable to detect sensor\n");
-		return 1;
+		//bmp180_eprom_t eprom;
+		//bmp180_dump_eprom(sens, &eprom);
+		//bmp180_set_oss(sens, 1);
 	}
 
     return 0;
 }
 
-int writeSensorDataToFile(FILE **dataFile, float *temp, float *pres, struct tm *time)
+int writeSensorDataToFile(FILE **dataFile, struct SensorValues *sensVals)
 {
-	// convert time to readable time and remove '\n' from last char in array
-	char *editedTime = "";
-	editedTime = asctime(time);
-	editedTime[strlen(editedTime) - 1] = '\0';
-
-	// write timestamp -> temperature -> pressure to file in json style
-	fprintf(*dataFile, "{\"timestamp\":\"%s\",", editedTime);
-	fprintf(*dataFile, "\"temperature\":%.1f,", *temp);
-	fprintf(*dataFile, "\"pressure\":%.1f}\n", *pres);
+	// Write sensor values to file in json format
+	fprintf(*dataFile, "{\"sensorID\":\"%s\",", sensVals->id);
+	fprintf(*dataFile, "\"timestamp\":\"%s\",", sensVals->time);
+	fprintf(*dataFile, "\"temperature\":%.1f,", sensVals->temperature);
+	fprintf(*dataFile, "\"pressure\":%.1f}\n", sensVals->pressure);
 
 	return 0;
 }
