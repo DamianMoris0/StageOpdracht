@@ -1,13 +1,24 @@
-BMP180=lib/bmp180driver
-SENSOR=lib/sensor
-MQTT=lib/mqtt
+# Paths to library source files
+BMP180 = lib/bmp180driver.c
+SENSOR = lib/sensor.c
+MQTT = lib/mqtt.c
+JSON = lib/cJSON.c
 
-all:
-	gcc -Wall -c $(BMP180).c -o $(BMP180).o -lm -li2c
-	gcc -Wall -c $(SENSOR).c -o $(SENSOR).o -lm -li2c
-	gcc -Wall -c $(MQTT).c -o $(MQTT).o -lpaho-mqtt3cs -lssl -lcrypto
+# Compiler and flags
+CC = gcc
+CFLAGS = -Wall
 
-	gcc -Wall $(BMP180).o $(SENSOR).o $(MQTT).o main.c -o main.o -lm -li2c -lpaho-mqtt3cs -lssl -lcrypto
+# Target executable name
+TARGET = main.o
+
+# Libraries required
+LIBS = -lpaho-mqtt3cs -lssl -lcrypto -lm -li2c
+
+all: $(TARGET)
+
+# Rule to build the main executable
+$(TARGET): $(BMP180) $(SENSOR) $(MQTT) $(JSON) main.c
+	$(CC) $(CFLAGS) $(BMP180) $(SENSOR) $(MQTT) $(JSON) main.c -o $(TARGET) $(LIBS)
 
 clean:
-	rm *.o > /dev/null 2>&1 &
+	rm -f $(TARGET) > /dev/null 2>&1
