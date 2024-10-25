@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <string.h>
+#include <math.h>
 #include "MQTTClient.h"
 #include "lib/bmp180driver.h"
 #include "lib/sensor.h"
@@ -24,14 +25,13 @@ int main()
 	MQTTClient client;
     MQTTClient_SSLOptions sslOptions = MQTTClient_SSLOptions_initializer;
     MQTTClient_connectOptions connectOptions = MQTTClient_connectOptions_initializer;
-    char *payloadMessage = "{\"sensorID\":\"Sensor_1\",\"timestamp\":\"Thu Oct 24 16:59:29 2024\",\"temperature\":18.3,\"pressure\":1006.0}";
+    char* jsonPayloadMessage = createJsonFromSensorData(&sensorValues);
 
 	/* MQTT client x broker config & connection*/
     MQTTClient_create(&client, ADDRESS, CLIENTID, MQTTCLIENT_PERSISTENCE_NONE, NULL); 	// Create the MQTT client
     MQTTClient_setCallbacks(client, NULL, connlost, msgarrvd, delivered); 				// Set the MQTT client callback functions
     configSSL(&sslOptions, &connectOptions); 											// Configure SSL options
     connectBroker(client, &connectOptions); 											// Connect to the MQTT broker
-    publishMessage(client, payloadMessage); 											// Publish a message
 
 	/* Initialise sensor */
 	initSensor(&sensor, sensorValues.type);
@@ -44,24 +44,30 @@ int main()
 	}
 
 	/* Read sensor data and write to file */
-	int loopAmount = SEND_DATA_INTERVAL / SAMPLE_TIME; 			// Specifies the amount of loops needed to send full json data file every SEND_DATA_INTERVAL seconds, with data samples every SAMPLE_TIME seconds
+	int loopAmount = SEND_DATA_INTERVAL / SAMPLE_TIME; // Specifies the amount of loops needed to send full json data file every SEND_DATA_INTERVAL seconds, with data samples every SAMPLE_TIME seconds
 	for (int i = 0; i < loopAmount; i++) {
-		sensorValues.temperature = bmp180_temperature(sensor);
-		sensorValues.pressure = bmp180_pressure(sensor) / 100; 	// Divide by 100 to get hPa
+		/* Convert pressure data into hPa + get one decimal place accuracy on values */
+		sensorValues.temperature = round(bmp180_temperature(sensor) * 100) / 100.0;
+		sensorValues.pressure = round(bmp180_pressure(sensor) / 10) / 10;
+
+		/* Check data bounds of sensor data values */
 		if (checkDataBounds(sensorValues.temperature, sensorValues.pressure)) {
 			printf("Sensor data out of bounds\n");
-			i--; 												// Decrement i and continue to read again, so json file will be the same size
+			i--; // Decrement i and continue to read again, so json file will be the same size
 			continue;
 		}
 
-		/* Get raw time and convert to readable time and remove '\n' from last char in array */
+		/* Get raw time and convert to readable time + remove '\n' from last char in array */
 		time(&rawtime);
 		timeinfo = localtime(&rawtime);
 		sensorValues.time = asctime(timeinfo);
 		sensorValues.time[strlen(sensorValues.time) - 1] = '\0';
 
-		writeSensorDataToFile(&sensorDataFile, &sensorValues);
-		usleep(SAMPLE_TIME); 									// Time in µs
+		/* Publish MQTT message on topic + write sensor data to file for potential future use */
+		jsonPayloadMessage = createJsonFromSensorData(&sensorValues);
+		publishMessage(client, jsonPayloadMessage);
+		writeSensorDataToFile(&sensorDataFile, jsonPayloadMessage);
+		usleep(SAMPLE_TIME); // Time in µs
 	}
 
 	/* Close file and bmp180 */

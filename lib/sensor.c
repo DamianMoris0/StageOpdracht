@@ -1,5 +1,6 @@
 #include "bmp180driver.h"
 #include "sensor.h"
+#include "cJSON.h"
 #include <stdio.h>
 #include <time.h>
 
@@ -26,18 +27,35 @@ int initSensor(void *sens, int type)
     return 0;
 }
 
-int writeSensorDataToFile(FILE **dataFile, struct SensorValues *sensVals)
+char* createJsonFromSensorData(struct SensorValues *sensVals)
+{
+    /* Create a json object */
+    cJSON *json = cJSON_CreateObject();
+    
+    /* Add data from struct to JSON */
+    cJSON_AddStringToObject(json, "sensorID", 	 sensVals->id);
+    cJSON_AddStringToObject(json, "timestamp", 	 sensVals->time);
+    cJSON_AddNumberToObject(json, "temperature", sensVals->temperature);
+    cJSON_AddNumberToObject(json, "pressure", 	 sensVals->pressure);
+
+	/* Convert json object to string */
+    char *jsonString = cJSON_Print(json);
+
+	/* Clean json object */
+    cJSON_Delete(json);
+
+	return jsonString;
+}
+
+int writeSensorDataToFile(FILE **dataFile, char* jsonSensVals)
 {
 	// Write sensor values to file in json format
-	fprintf(*dataFile, "{\"sensorID\":\"%s\",", sensVals->id);
-	fprintf(*dataFile, "\"timestamp\":\"%s\",", sensVals->time);
-	fprintf(*dataFile, "\"temperature\":%.1f,", sensVals->temperature);
-	fprintf(*dataFile, "\"pressure\":%.1f}\n", sensVals->pressure);
+	fprintf(*dataFile, "%s", jsonSensVals);
 
 	return 0;
 }
 
-int checkDataBounds(float temp, float pres)
+int checkDataBounds(double temp, double pres)
 {
 	if (temp <= -50 || temp >= 50) {
 		return 1;
