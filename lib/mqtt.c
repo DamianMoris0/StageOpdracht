@@ -27,7 +27,7 @@ void connlost(void *context, char *cause)
     printf("     cause: %s\n", cause);
 }
 
-void configSSL(MQTTClient_SSLOptions *ssl_opts, MQTTClient_connectOptions *conn_opts)
+void configSSL(MQTTClient_SSLOptions *ssl_opts, MQTTClient_connectOptions *conn_opts, char* username)
 {
     /* SSL/TLS options */
     ssl_opts->trustStore = NULL;             // CA certificate (if available, otherwise not required)
@@ -40,7 +40,7 @@ void configSSL(MQTTClient_SSLOptions *ssl_opts, MQTTClient_connectOptions *conn_
     conn_opts->keepAliveInterval = 20;
     conn_opts->cleansession = 1;
     conn_opts->ssl = ssl_opts;
-    conn_opts->username = USERNAME;
+    conn_opts->username = username;
 }
 
 int connectBroker(MQTTClient handle, MQTTClient_connectOptions *conn_opts)
@@ -70,7 +70,7 @@ int connectBroker(MQTTClient handle, MQTTClient_connectOptions *conn_opts)
     }
 }
 
-int publishMessage(MQTTClient handle, char* payload)
+int publishMessage(MQTTClient handle, char* topic, char* payload, char* clientid)
 {
     MQTTClient_message pubmsg = MQTTClient_message_initializer;
     pubmsg.payload = payload;
@@ -79,28 +79,11 @@ int publishMessage(MQTTClient handle, char* payload)
     pubmsg.retained = 0;
     MQTTClient_deliveryToken token;
 
-    MQTTClient_publishMessage(handle, TOPIC, &pubmsg, &token);
-    printf("Waiting for publication of %s on topic %s for client with ClientID: %s\n", payload, TOPIC, CLIENTID);
+    MQTTClient_publishMessage(handle, topic, &pubmsg, &token);
+    printf("Waiting for publication of %s on topic %s for client with ClientID: %s\n", payload, topic, clientid);
     MQTTClient_waitForCompletion(handle, token, TIMEOUT);
     printf("Message with delivery token %d delivered\n", token);
 
     return 0;
 }
 
-//int main(int argc, char* argv[])
-//{
-//	/* MQTT variables */
-//	MQTTClient client;
-//    MQTTClient_SSLOptions sslOptions = MQTTClient_SSLOptions_initializer;
-//    MQTTClient_connectOptions connectOptions = MQTTClient_connectOptions_initializer;
-//    char *payloadMessage = "Insert json data here";
-//
-//	/* MQTT */
-//    MQTTClient_create(&client, ADDRESS, CLIENTID, MQTTCLIENT_PERSISTENCE_NONE, NULL); 	// Create the MQTT client
-//    MQTTClient_setCallbacks(client, NULL, connlost, msgarrvd, delivered); 				// Set the MQTT client callback functions
-//    configSSL(&sslOptions, &connectOptions); 											// Configure SSL options
-//    connectBroker(client, &connectOptions); 											// Connect to the MQTT broker
-//    publishMessage(client, payloadMessage); 											// Publish a message
-//
-//    return 0;
-//}

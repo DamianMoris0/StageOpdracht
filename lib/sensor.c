@@ -17,6 +17,7 @@ int initSensor(void *sens, int type)
 		bmp180_set_oss(sens, 1);
 	}
 	else {
+		printf("Sensor type not found");
 		return 1;
 		/* Default to BMP180 sensor */
 		//bmp180_eprom_t eprom;
@@ -34,6 +35,7 @@ char* createJsonFromSensorData(struct SensorValues *sensVals)
     
     /* Add data from struct to JSON */
     cJSON_AddStringToObject(json, "sensorID", 	 sensVals->id);
+	cJSON_AddStringToObject(json, "sensorType",	 sensVals->typeStr);
     cJSON_AddStringToObject(json, "timestamp", 	 sensVals->time);
     cJSON_AddNumberToObject(json, "temperature", sensVals->temperature);
     cJSON_AddNumberToObject(json, "pressure", 	 sensVals->pressure);
@@ -49,7 +51,7 @@ char* createJsonFromSensorData(struct SensorValues *sensVals)
 
 int writeSensorDataToFile(FILE **dataFile, char* jsonSensVals)
 {
-	// Write sensor values to file in json format
+	/* Write sensor values to file in json format */
 	fprintf(*dataFile, "%s", jsonSensVals);
 
 	return 0;
@@ -66,4 +68,20 @@ int checkDataBounds(double temp, double pres)
 	}
 
 	return 0;
+}
+
+char* getSensorTypeName(int type)
+{
+	char* sensorTypeName = "DEFAULT_SENSOR";
+
+	switch (type) {
+	case BMP180:
+		sensorTypeName = "BMP180";
+		break;
+	default:
+		sensorTypeName = "DEFAULT_SENSOR";
+		break;
+	}
+
+	return sensorTypeName;
 }
