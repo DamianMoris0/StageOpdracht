@@ -86,4 +86,3 @@ int publishMessage(MQTTClient handle, char* topic, char* payload, char* clientid
 
     return 0;
 }
-

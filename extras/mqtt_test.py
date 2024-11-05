@@ -4,9 +4,10 @@ import ssl
 #path_to_root_cert = "../../Certificates/cert.pem"
 cert_file = "../../Certificates/cert.pem"
 key_file = "../../Certificates/key_nopass.pem"
-device_id = "RaspberryPi"
-iot_hub_name = "IotHubStage"
-
+device_id = "clientId-test-stage-example"
+#iot_hub_name = "IotHubStage"
+#client_username = iot_hub_name + ".azure-devices.net/" + device_id + "/?api-version=2021-04-12"
+user = "demouser"
 
 def on_connect(client, userdata, flags, rc):
     print("Device connected with result code: " + str(rc))
@@ -27,13 +28,12 @@ client.on_disconnect = on_disconnect
 client.on_publish = on_publish
 
 # Set the username but not the password on your client
-client.username_pw_set(username=iot_hub_name+".azure-devices.net/" +
-                       device_id + "/?api-version=2021-04-12", password=None)
+client.username_pw_set(username=user, password=None)
 
-client.tls_set(ca_certs=None, certfile=cert_file, keyfile=key_file,
-               cert_reqs=ssl.CERT_REQUIRED, tls_version=ssl.PROTOCOL_TLSv1_2, ciphers=None)
+client.tls_set(ca_certs=None, certfile=cert_file, keyfile=key_file, cert_reqs=ssl.CERT_REQUIRED, tls_version=ssl.PROTOCOL_TLSv1_2, ciphers=None)
 
-client.connect(iot_hub_name+".azure-devices.net", port=8883)
+client.connect("mqtt-dashboard.com", port=8883)
+#client.connect(iot_hub_name+".azure-devices.net", port=8883)
 
-client.publish("devices/" + device_id + "/messages/events/", '{"id":123}', qos=1)
+client.publish("testtopic/", '{"id":123}', qos=1)
 client.loop_forever()

@@ -132,8 +132,8 @@ int main()
 
 	/* Disconnect MQTT connection */
     MQTTClient_disconnect(client1.handle, 10000);
-	MQTTClient_disconnect(client2.handle, 10000);
     MQTTClient_destroy(&client1.handle);
+	MQTTClient_disconnect(client2.handle, 10000);
 	MQTTClient_destroy(&client2.handle);
 
 	return 0;
