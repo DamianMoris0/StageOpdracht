@@ -34,11 +34,36 @@ char* createJsonFromSensorData(struct SensorValues *sensVals)
     cJSON *json = cJSON_CreateObject();
     
     /* Add data from struct to JSON */
-    cJSON_AddStringToObject(json, "sensorID", 	 sensVals->id);
-	cJSON_AddStringToObject(json, "sensorType",	 sensVals->typeStr);
-    cJSON_AddStringToObject(json, "timestamp", 	 sensVals->time);
-    cJSON_AddNumberToObject(json, "temperature", sensVals->temperature);
-    cJSON_AddNumberToObject(json, "pressure", 	 sensVals->pressure);
+    if(sensVals->id != NULL) {
+		cJSON_AddStringToObject(json, "sensorID", sensVals->id);
+	}
+	else {
+		cJSON_AddStringToObject(json, "sensorID", "?");
+	}
+	if(sensVals->typeStr != NULL) {
+		cJSON_AddStringToObject(json, "sensorType",	sensVals->typeStr);
+	}
+	else {
+		cJSON_AddStringToObject(json, "sensorType",	"?");
+	}
+    if(sensVals->time != NULL) {
+		cJSON_AddStringToObject(json, "timestamp", sensVals->time);
+	}
+	else {
+		cJSON_AddStringToObject(json, "timestamp", "?");
+	}
+    //if(sensVals->temperature != NULL) {
+		cJSON_AddNumberToObject(json, "temperature", sensVals->temperature);
+	//}
+	//else {
+	//	
+	//}
+    //if(sensVals->pressure != NULL) {
+		cJSON_AddNumberToObject(json, "pressure", sensVals->pressure);
+	//}
+	//else {
+	//	
+	//}
 
 	/* Convert json object to string */
     char *jsonString = cJSON_Print(json);
