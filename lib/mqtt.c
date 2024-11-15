@@ -27,20 +27,22 @@ void connlost(void *context, char *cause)
     printf("     cause: %s\n", cause);
 }
 
-void configSSL(MQTTClient_SSLOptions *ssl_opts, MQTTClient_connectOptions *conn_opts, char* username)
+int configSSL(MQTTClient_SSLOptions *ssl_opts, MQTTClient_connectOptions *conn_opts, char* username)
 {
     /* SSL/TLS options */
-    ssl_opts->trustStore = NULL;             // CA certificate (if available, otherwise not required)
-    ssl_opts->keyStore = CLIENT_CERT_PATH;   // Client certificate
-    ssl_opts->privateKey = CLIENT_KEY_PATH;  // Client private key
-    ssl_opts->enableServerCertAuth = 0;      // If CA certificate available set to 1, otherwise 0
-    ssl_opts->sslVersion = MQTT_SSL_VERSION_TLS_1_2;
+    //ssl_opts->trustStore = NULL;             // CA certificate (if available, otherwise not required)
+    //ssl_opts->keyStore = CLIENT_CERT_PATH;   // Client certificate
+    //ssl_opts->privateKey = CLIENT_KEY_PATH;  // Client private key
+    //ssl_opts->enableServerCertAuth = 0;      // If CA certificate available set to 1, otherwise 0
+    //ssl_opts->sslVersion = MQTT_SSL_VERSION_TLS_1_2;
 
     /* Connection options */
     conn_opts->keepAliveInterval = 20;
     conn_opts->cleansession = 1;
-    conn_opts->ssl = ssl_opts;
+    //conn_opts->ssl = ssl_opts;
     conn_opts->username = username;
+
+    return 0;
 }
 
 int connectBroker(MQTTClient handle, MQTTClient_connectOptions *conn_opts)

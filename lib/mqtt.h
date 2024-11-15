@@ -28,6 +28,6 @@ struct Client {
 void delivered(void *context, MQTTClient_deliveryToken dt);
 int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *message);
 void connlost(void *context, char *cause);
-void configSSL(MQTTClient_SSLOptions *ssl_opts, MQTTClient_connectOptions *conn_opts, char* username);
+int configSSL(MQTTClient_SSLOptions *ssl_opts, MQTTClient_connectOptions *conn_opts, char* username);
 int connectBroker(MQTTClient handle, MQTTClient_connectOptions *conn_opts);
 int publishMessage(MQTTClient handle, char* topic, char* payload, char* clientid);
