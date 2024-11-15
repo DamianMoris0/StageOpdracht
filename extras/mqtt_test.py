@@ -28,12 +28,12 @@ client.on_disconnect = on_disconnect
 client.on_publish = on_publish
 
 # Set the username but not the password on your client
-client.username_pw_set(username=user, password=None)
+client.username_pw_set(username=None, password=None)
 
-client.tls_set(ca_certs=None, certfile=cert_file, keyfile=key_file, cert_reqs=ssl.CERT_REQUIRED, tls_version=ssl.PROTOCOL_TLSv1_2, ciphers=None)
+#client.tls_set(ca_certs=None, certfile=cert_file, keyfile=key_file, cert_reqs=ssl.CERT_REQUIRED, tls_version=ssl.PROTOCOL_TLSv1_2, ciphers=None)
 
-client.connect("mqtt-dashboard.com", port=8883)
+client.connect("172.16.0.72", port=1883)
 #client.connect(iot_hub_name+".azure-devices.net", port=8883)
 
-client.publish("testtopic/", '{"id":123}', qos=1)
+client.publish("sensor/data", '{"temperature": 20.0, "pressure": 1000.0}', qos=1)
 client.loop_forever()
