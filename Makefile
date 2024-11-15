@@ -12,7 +12,7 @@ CFLAGS = -Wall
 TARGET = main.o
 
 # Libraries required
-LIBS = -lpaho-mqtt3cs -lssl -lcrypto -lm -li2c
+LIBS = -lpaho-mqtt3c -lpaho-mqtt3cs -lssl -lcrypto -lm -li2c
 
 all: $(TARGET)
 
