@@ -35,16 +35,16 @@ void test_createJsonFromSensorData(void)
 
 
 	/* Check it sensor values are correctly converted into the right json string */
-	TEST_ASSERT_EQUAL_STRING_MESSAGE("{sensorID=\"Sensor_1\",sensorType=\"BMP180\",timestamp=\"13:01:24\",temperature=21.3,pressure=1009.6}",
+	TEST_ASSERT_EQUAL_STRING_MESSAGE("{\n\t\"sensorID\":\t\"Sensor_1\",\n\t\"sensorType\":\t\"BMP180\",\n\t\"timestamp\":\t\"13:01:24\",\n\t\"temperature\":\t21.3,\n\t\"pressure\":\t1009.6\n}",
 									 createJsonFromSensorData(&sensorData1), "Normal sensor data to json string conversion");
-	TEST_ASSERT_EQUAL_STRING_MESSAGE("{sensorID=\"Sensor_2\",sensorType=\"DEFAULT_SENSOR\",timestamp=\"13:01:24\",temperature=21.3,pressure=1009.6}",
+	TEST_ASSERT_EQUAL_STRING_MESSAGE("{\n\t\"sensorID\":\t\"Sensor_2\",\n\t\"sensorType\":\t\"DEFAULT_SENSOR\",\n\t\"timestamp\":\t\"13:01:24\",\n\t\"temperature\":\t21.3,\n\t\"pressure\":\t1009.6\n}",
 									 createJsonFromSensorData(&sensorData2), "Normal sensor data to json string conversion");
-	TEST_ASSERT_EQUAL_STRING_MESSAGE("{sensorID=\"Sensor_3\",sensorType=\"BMP180\",timestamp=\"?\",temperature=,pressure=1009.6}",
+	TEST_ASSERT_EQUAL_STRING_MESSAGE("{\n\t\"sensorID\":\t\"Sensor_3\",\n\t\"sensorType\":\t\"BMP180\",\n\t\"timestamp\":\t\"?\",\n\t\"temperature\":\t0,\n\t\"pressure\":\t1009.6\n}",
 									 createJsonFromSensorData(&sensorData3), "No timestamp and temperature in sensor values");
-	TEST_ASSERT_EQUAL_STRING_MESSAGE("{sensorID=\"Sensor_4\",sensorType=\"?\",timestamp=\"?\",temperature=21.3,pressure=1009.6}",
+	TEST_ASSERT_EQUAL_STRING_MESSAGE("{\n\t\"sensorID\":\t\"Sensor_4\",\n\t\"sensorType\":\t\"?\",\n\t\"timestamp\":\t\"?\",\n\t\"temperature\":\t0,\n\t\"pressure\":\t0\n}",
 									 createJsonFromSensorData(&sensorData4), "No sensor type string, timestamp, temperature and pressure");
-	TEST_ASSERT_EQUAL_STRING_MESSAGE("{sensorID=\"?\",sensorType=\"?\",timestamp=\"?\",temperature=,pressure=}",
-									 createJsonFromSensorData(&sensorData5), "Empty struct");									 
+	TEST_ASSERT_EQUAL_STRING_MESSAGE("{\n\t\"sensorID\":\t\"?\",\n\t\"sensorType\":\t\"?\",\n\t\"timestamp\":\t\"?\",\n\t\"temperature\":\t0,\n\t\"pressure\":\t0\n}",
+									 createJsonFromSensorData(&sensorData5), "Empty struct");
 }
 
 void test_writeSensorDataToFile(void)
@@ -63,7 +63,7 @@ void test_checkDataBounds(void)
 	TEST_ASSERT_EQUAL_FLOAT_MESSAGE(0, checkDataBounds(21, 1013.123456789123456789123456789), "Pressure big floating point size");
 
 	/* Check out of lower bounds */
-	TEST_ASSERT_EQUAL_FLOAT_MESSAGE(0, checkDataBounds(-200, 1013), "Temperature out of lower bound");
+	TEST_ASSERT_EQUAL_FLOAT_MESSAGE(1, checkDataBounds(-200, 1013), "Temperature out of lower bound");
 	TEST_ASSERT_EQUAL_FLOAT_MESSAGE(1, checkDataBounds(21, 500.5),  "Pressure out of lower bound");
 
 	/* Check out of upper bound */
@@ -79,7 +79,7 @@ void test_getSensorTypeName(void)
 	TEST_ASSERT_EQUAL_STRING_MESSAGE("DEFAULT_SENSOR", getSensorTypeName(1), 	  "Sensor type returns default");
 	TEST_ASSERT_EQUAL_STRING_MESSAGE("DEFAULT_SENSOR", getSensorTypeName(222), 	  "Sensor type returns default");
 	TEST_ASSERT_EQUAL_STRING_MESSAGE("DEFAULT_SENSOR", getSensorTypeName(-1), 	  "Sensor type returns default");
-	TEST_ASSERT_EQUAL_STRING_MESSAGE("DEFAULT_SENSOR", getSensorTypeName(0.0246), "Sensor type returns default");
+	TEST_ASSERT_EQUAL_STRING_MESSAGE("DEFAULT_SENSOR", getSensorTypeName(7.3246), "Sensor type returns default");
 }
 
 int main(void)
