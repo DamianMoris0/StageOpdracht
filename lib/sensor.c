@@ -52,18 +52,8 @@ char* createJsonFromSensorData(struct SensorValues *sensVals)
 	else {
 		cJSON_AddStringToObject(json, "timestamp", "?");
 	}
-    //if(sensVals->temperature != NULL) {
-		cJSON_AddNumberToObject(json, "temperature", sensVals->temperature);
-	//}
-	//else {
-	//	
-	//}
-    //if(sensVals->pressure != NULL) {
-		cJSON_AddNumberToObject(json, "pressure", sensVals->pressure);
-	//}
-	//else {
-	//	
-	//}
+	cJSON_AddNumberToObject(json, "temperature", sensVals->temperature);
+	cJSON_AddNumberToObject(json, "pressure", sensVals->pressure);
 
 	/* Convert json object to string */
     char *jsonString = cJSON_Print(json);
