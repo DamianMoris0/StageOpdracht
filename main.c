@@ -61,19 +61,18 @@ int main()
 	//	.password = 		PASSWORD2,
 	//};
 
-	///* Inintialise client 3 */
-	//MQTTClient_SSLOptions sslOpts3 = MQTTClient_SSLOptions_initializer;
-	//MQTTClient_connectOptions connOpts3 = MQTTClient_connectOptions_initializer;
-	//struct Client client3 = {
-    //	.sslOptions = 		sslOpts3,
-    //	.connectOptions = 	connOpts3,
-    //	.address = 			ADDRESS3,
-    //	.id = 				CLIENTID3,
-    //	.topic = 			TOPIC3,
-    //	.username = 		USERNAME3,
-	//	.password = 		PASSWORD3,
-	//};
-	//client3.connectOptions.ssl = NULL;
+	/* Inintialise client 3 */
+	MQTTClient_SSLOptions sslOpts3 = MQTTClient_SSLOptions_initializer;
+	MQTTClient_connectOptions connOpts3 = MQTTClient_connectOptions_initializer;
+	struct Client client3 = {
+    	.sslOptions = 		sslOpts3,
+    	.connectOptions = 	connOpts3,
+    	.address = 			ADDRESS3,
+    	.id = 				CLIENTID3,
+    	.topic = 			TOPIC3,
+    	.username = 		USERNAME3,
+		.password = 		PASSWORD3,
+	};
 
 	/* MQTT client x broker config & connection*/
 	///* Client 1 */
@@ -91,14 +90,20 @@ int main()
 	///* Client 2 */
     //MQTTClient_create(&client2.handle, client2.address, client2.id, MQTTCLIENT_PERSISTENCE_NONE, NULL); 	// Create the MQTT client
     //MQTTClient_setCallbacks(client2.handle, NULL, connlost, msgarrvd, delivered); 							// Set the MQTT client callback functions
-    //configSSL(&client2.sslOptions, &client2.connectOptions, client2.username); 								// Configure SSL options
+    //configSSL(&client2.sslOptions, &client2.connectOptions, client2.username, client2.password); 								// Configure SSL options
     //connectBroker(client2.handle, &client2.connectOptions); 												// Connect to the MQTT broker
 
-	///* Client 3 */
-    //MQTTClient_create(&client3.handle, client3.address, client3.id, MQTTCLIENT_PERSISTENCE_NONE, NULL); 	// Create the MQTT client
-    //MQTTClient_setCallbacks(client3.handle, NULL, connlost, msgarrvd, delivered); 							// Set the MQTT client callback functions
-    //configSSL(&client3.sslOptions, &client3.connectOptions, client3.username); 								// Configure SSL options
-    //connectBroker(client3.handle, &client3.connectOptions); 												// Connect to the MQTT broker
+	/* Client 3 */
+    MQTTClient_create(&client3.handle, client3.address, client3.id, MQTTCLIENT_PERSISTENCE_NONE, NULL); 	// Create the MQTT client
+    MQTTClient_setCallbacks(client3.handle, NULL, connlost, msgarrvd, delivered); 							// Set the MQTT client callback functions
+    configSSL(&client3.sslOptions, &client3.connectOptions, client3.username, client3.password); 								// Configure SSL options
+    connectBroker(client3.handle, &client3.connectOptions); 												// Connect to the MQTT broker
+
+	char* getDataTopic = NULL;
+	getDataTopic = (char*)malloc(strlen(sensorValues.id) + 2); // +2 because of the two added '/' & '\0' characters
+	strcpy(getDataTopic, sensorValues.id);
+	strcat(getDataTopic, "/");
+	subscribeTopic(client3.handle, getDataTopic);
 
 	/* Initialise sensor */
 	initSensor(&sensor, sensorValues.typeID);
@@ -118,6 +123,8 @@ int main()
 	} else {
 		loopAmount = SEND_JSON_DATA_FILE_INTERVAL / SAMPLE_TIME; // Calculate amount of loops needed for specified SEND_JSON_DATA_FILE_INTERVAL per SAMPLE_TIME
 	}
+
+	int variableSampleTime = SAMPLE_TIME;
 
 	/* Read sensor data and publish on mqtt topic + write to file if specified */
 	for (;;) {
@@ -150,21 +157,44 @@ int main()
 			if (publish_json_on_mqtt_topic_flag) {
 				//publishMessage(client1.handle, client1.topic, jsonPayloadMessage, client1.id); // Client 1
 				//publishMessage(client2.handle, client2.topic, jsonPayloadMessage, client2.id); // Client 2
-				//publishMessage(client3.handle, client3.topic, jsonPayloadMessage, client3.id); // Client 3
+				publishMessage(client3.handle, client3.topic, jsonPayloadMessage, client3.id); // Client 3
 			}
 
 			/* Receive MQTT on subscribed topics */
-			message_received_flag = 1;
+			//message_received_flag = 1;
 			if (message_received_flag) {
 				printf("Message received in main: %s\n", receivedPayload);
-				parsedPayload = parsePayload("get/temp");
-				//printf("parsed: %s %s\n", parsedPayload.function, parsedPayload.value);
+				parsedPayload = parsePayload(receivedPayload);
+				printf("parsed:%s%s/%d %d %d %d\n", parsedPayload.function, parsedPayload.value, strlen(parsedPayload.function), strlen(parsedPayload.value), strlen("get"), strlen("temp"));
+				printf("parsed:%s %s\n", parsedPayload.function, parsedPayload.value);
 				if (!strcmp(parsedPayload.function, "get")) {
-					printf("Function 'get' was called\n");
+					if (!strcmp(parsedPayload.value, "temp")) {
+						char bufferStrTemp[sizeof(sensorValues.temperature)];
+						sprintf(bufferStrTemp, "%.2f", sensorValues.temperature);
+						publishMessage(client3.handle, "sensor/get/", bufferStrTemp, client3.id);
+						printf("Message published on topic sensor/get/ with payload %s\n", bufferStrTemp);
+					}
+					else if (!strcmp(parsedPayload.value, "pres")) {
+						char bufferStrPres[sizeof(sensorValues.pressure)];
+						sprintf(bufferStrPres, "%.2f", sensorValues.pressure);
+						publishMessage(client3.handle, "sensor/get/", bufferStrPres, client3.id);
+						printf("Message published on topic sensor/get/ with payload %s\n", bufferStrPres);
+					}
+					else {
+						publishMessage(client3.handle, "sensor/get/", "Wrong Input", client3.id);
+						printf("ERROR: function get was called but value was wrong.\n");
+					}
+					printf("Function '%s' was called\n", parsedPayload.function);
 				}
-				//else {
-				//	printf("Function 'get' was not called\n");
-				//}
+				else if (!strcmp(parsedPayload.function, "interval")) {
+					variableSampleTime = atoi(parsedPayload.value);
+					printf("Function 'interval' was called with payload %s\n", parsedPayload.value);
+				}
+				else {
+					printf("Function wasn't able to be deciphered\n");
+				}
+				free(parsedPayload.function);
+				free(parsedPayload.value);
 				message_received_flag = 0;
 			}
 
@@ -173,7 +203,7 @@ int main()
 				writeSensorDataToFile(&sensorDataFile, jsonPayloadMessage);
 			}
 
-			usleep(SAMPLE_TIME); // Time in µs
+			usleep(variableSampleTime); // Time in µs
 		}
 		if (write_to_json_file_flag || loopCounter >= MAX_FAULTY_SENSOR_READINGS) {
 			break; // If data is written to file, break loop to be able to access data.json file, can be changed in the future for other purposes
@@ -193,8 +223,8 @@ int main()
     //MQTTClient_destroy(&client1.handle);
 	//MQTTClient_disconnect(client2.handle, TIMEOUT);
 	//MQTTClient_destroy(&client2.handle);
-	//MQTTClient_disconnect(client3.handle, TIMEOUT);
-	//MQTTClient_destroy(&client3.handle);
+	MQTTClient_disconnect(client3.handle, TIMEOUT);
+	MQTTClient_destroy(&client3.handle);
 
 	return 0;
 }
