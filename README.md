@@ -36,6 +36,11 @@ You can check if the 1 Mb RAM drive has been succesfully created by typing ```df
 For the MQTT communication this project will use the Paho MQTT C client library from Eclipse.
 To install the needed MQTT library you can follow the instructions on the [paho.mqtt.c](https://github.com/eclipse/paho.mqtt.c) repo.
 
+### Curl (needed for implementation with Testrail)
+To use Testrail as a tool for bundling all the testcases, curl has to be installed to do the https POST requests needed to communicate with the test suite.
+For this just run ```sudo apt-get install libcurl4-openssl-dev``` in the root directory of the RPi.
+This will intall curl internally.
+
 ## Connection sensor
 To connect the BMP180 sensor to the Raspberry Pi:
 - BMP180 ----- RPi
