@@ -16,9 +16,10 @@ void test_configSSL(void)
     	.id = 				CLIENTID1,
     	.topic = 			TOPIC1,
     	.username = 		USERNAME1,
+		.password =			PASSWORD1,
 	};
 
-    TEST_ASSERT_EQUAL_MESSAGE(0, configSSL(&testClient1.sslOptions, &testClient1.connectOptions, testClient1.username), "Succesfully created client");
+    TEST_ASSERT_EQUAL_MESSAGE(0, configSSL(&testClient1.sslOptions, &testClient1.connectOptions, testClient1.username, testClient1.password), "Succesfully created client");
 }
 
 void test_connectBroker(void)

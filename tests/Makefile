@@ -5,11 +5,11 @@ UNITY_ROOT = ../unity
 CFLAGS += -Wall
 
 # Libraries to link
-LIBS = -lpaho-mqtt3cs -lssl -lcrypto -lm -li2c
+LIBS = -lpaho-mqtt3cs -lssl -lcrypto -lm -li2c -lcurl
 
 # Source files and include directories
-SRC_FILES_MQTT = $(UNITY_ROOT)/unity.c ../lib/bmp180driver.c ../lib/sensor.c ../lib/cJSON.c ../lib/mqtt.c test_mqtt.c
-SRC_FILES_SENSOR = $(UNITY_ROOT)/unity.c ../lib/bmp180driver.c ../lib/sensor.c ../lib/cJSON.c ../lib/mqtt.c test_sensor.c
+SRC_FILES_MQTT = $(UNITY_ROOT)/unity.c $(UNITY_ROOT)/unity_testrail.c ../lib/bmp180driver.c ../lib/sensor.c ../lib/cJSON.c ../lib/mqtt.c test_mqtt.c
+SRC_FILES_SENSOR = $(UNITY_ROOT)/unity.c $(UNITY_ROOT)/unity_testrail.c ../lib/bmp180driver.c ../lib/sensor.c ../lib/cJSON.c ../lib/mqtt.c test_sensor.c
 INC_DIRS = -Isrc -I$(UNITY_ROOT)
 
 # Targets

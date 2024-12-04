@@ -21,7 +21,6 @@ void test_initSensor(void)
 
 	TEST_ASSERT_EQUAL_MESSAGE(0, initSensor(&testSensor4, BMP180), "Wrong sensor address and I2C path");
 	TEST_ASSERT_EQUAL_MESSAGE(0, initSensor(&testSensor5, 1),	   "Non existend sensor type");
-	
 }
 
 void test_createJsonFromSensorData(void)
@@ -90,5 +89,6 @@ int main(void)
 	//RUN_TEST(test_writeSensorDataToFile);
 	RUN_TEST(test_checkDataBounds);
 	RUN_TEST(test_getSensorTypeName);
+
 	return UNITY_END();
 }

@@ -6,6 +6,7 @@
 ========================================================================= */
 
 #include "unity.h"
+#include "unity_testrail.h" // include to use unity with testrail
 
 #ifndef UNITY_PROGMEM
 #define UNITY_PROGMEM
@@ -545,6 +546,8 @@ static void UnityTestResultsFailBegin(const UNITY_LINE_TYPE line)
 /*-----------------------------------------------*/
 void UnityConcludeTest(void)
 {
+    char* status;
+
     if (Unity.CurrentTestIgnored)
     {
         Unity.TestIgnores++;
@@ -553,11 +556,15 @@ void UnityConcludeTest(void)
     {
         UnityTestResultsBegin(Unity.TestFile, Unity.CurrentTestLineNumber);
         UnityPrint(UnityStrPass);
+        status = TESTRAIL_PASS; // custom test status pass
     }
     else
     {
         Unity.TestFailures++;
+        status = TESTRAIL_FAIL; // custom test status fail
     }
+
+    insertTestStatusToTestrail(Unity, status); // custom testrail insert function
 
     Unity.CurrentTestFailed = 0;
     Unity.CurrentTestIgnored = 0;
