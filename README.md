@@ -2,7 +2,9 @@
 
 ## Intro
 In this repo you will find code to read temperature and pressure data from a BMP180 sensor with a Raspberry Pi Zero 2 W and save it in RAM memory in a JSON file.
-This code will also be unit tested using [Unity](https://github.com/ThrowTheSwitch/Unity/tree/master).
+This code will also be unit tested using [Unity](https://github.com/ThrowTheSwitch/Unity/tree/master) and these results are inputted into Testrail with some custom additions to the Unity library to make this integration possible.
+
+To be able to follow the README, you need to have a working Raspberyr Pi Zero 2 W with Debian (Raspbian) Lite 32-bit Bullseye installed with SSH enabled and a password of choice ocnfigured to login to the RPi.
 
 ## Dependencies install
 
