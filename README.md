@@ -2,7 +2,9 @@
 
 ## Intro
 In this repo you will find code to read temperature and pressure data from a BMP180 sensor with a Raspberry Pi Zero 2 W and save it in RAM memory in a JSON file.
-This code will also be unit tested using [Unity](https://github.com/ThrowTheSwitch/Unity/tree/master).
+This code will also be unit tested using [Unity](https://github.com/ThrowTheSwitch/Unity/tree/master) and these results are inputted into Testrail with some custom additions to the Unity library to make this integration possible.
+
+To be able to follow the README, you need to have a working Raspberyr Pi Zero 2 W with Debian (Raspbian) Lite 32-bit Bullseye installed with SSH enabled and a password of choice ocnfigured to login to the RPi.
 
 ## Dependencies install
 
@@ -35,6 +37,11 @@ You can check if the 1 Mb RAM drive has been succesfully created by typing ```df
 ### MQTT
 For the MQTT communication this project will use the Paho MQTT C client library from Eclipse.
 To install the needed MQTT library you can follow the instructions on the [paho.mqtt.c](https://github.com/eclipse/paho.mqtt.c) repo.
+
+### Curl (needed for implementation with Testrail)
+To use Testrail as a tool for bundling all the testcases, curl has to be installed to do the https POST requests needed to communicate with the test suite.
+For this just run ```sudo apt-get install libcurl4-openssl-dev``` in the root directory of the RPi.
+This will intall curl internally.
 
 ## Connection sensor
 To connect the BMP180 sensor to the Raspberry Pi:
