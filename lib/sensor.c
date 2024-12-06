@@ -17,7 +17,7 @@ int initSensor(void *sens, int type)
 		bmp180_set_oss(sens, 1);
 	}
 	else {
-		printf("Sensor type not found");
+		printf("Sensor type not found\n");
 		return 1;
 		/* Default to BMP180 sensor */
 		//bmp180_eprom_t eprom;

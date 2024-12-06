@@ -126,47 +126,34 @@ struct ParsedPayload parsePayload(char* payload)
         .function = NULL,
         .value = NULL,
     };
-    //char* function = NULL;
-    //char* value = NULL;
 
     pPayload.function = (char*)malloc(1);
     pPayload.value = (char*)malloc(1);
 
-    printf("%d\n", strlen(payload));
     for (int i = 0; i < strlen(payload); i++) {
         if (payload[i] != '/') {
             pPayload.function = realloc(pPayload.function, strlen(pPayload.function) + 1);
             pPayload.function[i] = payload[i];
             pPayload.function[i + 1] = '\0';
-            //printf("\npayload[%d] != '/'\nfunction[%d] = %c\nfunction = %s\n\n", i, i, pPayload.function[i], pPayload.function);
-            //strcpy(function, (char*)payload[i]);
         }
         else {
-            printf("Function is: %s\n", pPayload.function);
             break;
             //return function;
         }
     }
 
     for (int i = 0; i < strlen(payload) - strlen(pPayload.function) - 1; i++) {
-        //pPayload.value[i - strlen(pPayload.function) - 1] = payload[i] != '\0' ? payload[i] : '\0';
         if (payload[i + strlen(pPayload.function) + 1] != '\0') {
             pPayload.value = realloc(pPayload.value, strlen(pPayload.value) + 1);
             pPayload.value[i] = payload[i + strlen(pPayload.function) + 1];
             pPayload.value[i + 1] = '\0';
-            printf("\n%c%c %d\n", pPayload.value[i], payload[i + strlen(pPayload.function) + 1], strlen(pPayload.value));
-            //printf("\npayload[%d] != '\\0'\nvalue[%d] = %c\nvalue = %s\n\n", i, i - strlen(pPayload.function) - 1, pPayload.value[i - strlen(pPayload.function) - 1], pPayload.value);
         }
         else {
-            printf("Value is: %s\n", pPayload.value);
             break;
         }
     }
 
-    printf("Succesfully parsed message, %s %s\n", pPayload.function, pPayload.value);
-
-    //free(pPayload.function);
-    //free(pPayload.value);
+    printf("Succesfully parsed message, funtion = %s value = %s\n", pPayload.function, pPayload.value);
 
     return pPayload;
 }
