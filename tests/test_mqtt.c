@@ -33,6 +33,7 @@ void test_connectBroker(void)
     	.id = 				CLIENTID1,
     	.topic = 			TOPIC1,
     	.username = 		USERNAME1,
+		.password =			PASSWORD1,
 	};
 
     TEST_ASSERT_EQUAL_MESSAGE(0, connectBroker(testClient1.handle, &testClient1.connectOptions), "Succesfully connected to broker"); 
@@ -49,6 +50,7 @@ void test_publishMessage(void)
     	.id = 				CLIENTID1,
     	.topic = 			TOPIC1,
     	.username = 		USERNAME1,
+		.password =			PASSWORD1,
 	};
     char* jsonPayloadMessage = "{}";
 
