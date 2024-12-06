@@ -5,37 +5,48 @@
 
 void insertTestStatusToTestrail(struct UNITY_STORAGE_T unity, char* st)
 {
-    int run_id = 2811;
-    int case_id;
-    char *comment;
+    int runId = TESTRAIL_RUN_ID;
+    int caseId;
+    char* comment;
+    char* execState;
 
-    if (!strcmp(unity.CurrentTestName, "test_initSensor")) {
-        case_id = 53235;
+    struct Tests tests[] = {
+        {.testName = "test_checkDataBounds",            .caseId = 53234},
+        {.testName = "test_initSensor",                 .caseId = 53235},
+        {.testName = "test_createJsonFromSensorData",   .caseId = 53236},
+        {.testName = "test_getSensorTypeName",          .caseId = 53237},
+        {.testName = "test_configSSL",                  .caseId = 53240},
+        {.testName = "test_connectBroker",              .caseId = 53241},
+        {.testName = "test_publishMessage",             .caseId = 53242},
+    };
+
+    for (int i = 0; i < sizeof(tests) / sizeof(tests[0]); i++) {
+        if (!strcmp(unity.CurrentTestName, tests[i].testName)) {
+            caseId = tests[i].caseId;
+            break;
+        }
     }
-    else if (!strcmp(unity.CurrentTestName, "test_createJsonFromSensorData")) {
-        case_id = 53236;
+
+    if (!strcmp(st, TESTRAIL_PASS)) {
+        execState = " executed successfully";
     }
-    else if (!strcmp(unity.CurrentTestName, "test_checkDataBounds")) {
-        case_id = 53234;
-    }
-    else if (!strcmp(unity.CurrentTestName, "test_getSensorTypeName")) {
-        case_id = 53237;
+    else if (!strcmp(st, TESTRAIL_FAIL)) {
+        execState = " execution failed";
     }
     else {
-        printf("else\n\n");
+        execState = " status unknown";
     }
-
-    comment = (char*)malloc((strlen(unity.CurrentTestName) + strlen(" executed successfully")) * sizeof(char) + 1);
+    comment = (char*)malloc((strlen(unity.CurrentTestName) + strlen(execState)) * sizeof(char) + 1);
     strcpy(comment, unity.CurrentTestName);
-    strcat(comment, " executed successfully");
-    
-    add_test_result(run_id, case_id, st, comment);
+    strcat(comment, execState);
+
+    add_test_result(runId, caseId, st, comment);
 
     free(comment);
 }
 
 // Function to post test results
-void add_test_result(int run_id, int case_id, char *status, char *comment) {
+void add_test_result(int runId, int caseId, char *status, char *comment) {
     CURL *curl;
     CURLcode res;
     char url[256];
@@ -43,7 +54,7 @@ void add_test_result(int run_id, int case_id, char *status, char *comment) {
     struct curl_slist *headers = NULL;
 
     // Construct the API endpoint URL
-    snprintf(url, sizeof(url), "%sadd_result_for_case/%d/%d", TESTRAIL_BASE_URL, run_id, case_id);
+    snprintf(url, sizeof(url), "%sadd_result_for_case/%d/%d", TESTRAIL_BASE_URL, runId, caseId);
 
     // Construct the JSON payload
     snprintf(data, sizeof(data), "{\"status_id\": %s, \"comment\": \"%s\"}", status, comment);
