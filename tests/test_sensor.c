@@ -28,7 +28,6 @@ void test_initSensor(void)
 	bmp180_close(testSensor3);
 	bmp180_close(testSensor4);
 	bmp180_close(testSensor5);
-
 }
 
 void test_createJsonFromSensorData(void)

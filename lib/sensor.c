@@ -14,8 +14,8 @@ int initSensor(void *sens, int type)
 
 	if (type == BMP180) {
 		bmp180_eprom_t eprom;
-		bmp180_dump_eprom(sens, &eprom);
-		bmp180_set_oss(sens, 1);
+		bmp180_dump_eprom(&sens, &eprom);
+		bmp180_set_oss(&sens, 1);
 		printf("Sensor of type %s has been initialised\n", getSensorTypeName(type));
 	}
 	else {
