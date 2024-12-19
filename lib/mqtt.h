@@ -1,22 +1,17 @@
 #include "MQTTClient.h"
 
-#define ADDRESS1    "mqtt-dashboard.com"  // Broker address with SSL "mqtt-dashboard.com"
-#define ADDRESS2    "ssl://WerkpleklerenBrightest.azure-devices.net:8883"
-#define ADDRESS3    "172.16.0.72:1883"
-#define CLIENTID1   "raspberry-testclient-stage"                               // Client ID for your MQTT client
-#define CLIENTID2   "RPI"
-#define CLIENTID3   "testdocker"
-#define TOPIC1      "testtopic/"      // Change to your topic "testtopic/"
-#define TOPIC2      "devices/RPI/messages/events/"              // Change to your topic "testtopic/"
-#define TOPIC3      "sensor/data"
-#define USERNAME1   "stage" //"stage"
-#define USERNAME2   "WerkpleklerenBrightest.azure-devices.net/RPI/?api-version=2021-04-12"
-#define USERNAME3   NULL
-#define PASSWORD1   "mqttpassword"
-#define PASSWORD2   NULL
-#define PASSWORD3   NULL
-#define QOS         1
-#define TIMEOUT     10000L
+#define ADDRESS1        "mqtt-dashboard.com"  // Broker address with SSL "mqtt-dashboard.com"
+#define ADDRESS3        "172.16.0.171:1883"
+#define CLIENTID1       "raspberry-testclient-stage"                               // Client ID for your MQTT client
+#define CLIENTID3       "testdocker"
+#define TOPIC1_SUFFIX   "/data/"      // Change to your topic "testtopic/"
+#define TOPIC3_SUFFIX   "/data/"
+#define USERNAME1       "stage" //"stage"
+#define USERNAME3       NULL
+#define PASSWORD1       "mqttpassword"
+#define PASSWORD3       NULL
+#define QOS             1
+#define TIMEOUT         10000L
 
 /* Paths to your certificates */
 #define CLIENT_CERT_PATH  "../Certificates/cert.pem"
@@ -46,3 +41,5 @@ int connectBroker(MQTTClient handle, MQTTClient_connectOptions *conn_opts);
 int publishMessage(MQTTClient handle, char* topic, char* payload, char* clientid);
 int subscribeTopic(MQTTClient handle, char* topic);
 struct ParsedPayload parsePayload(char* payload);
+int executeSubscribeFunction(MQTTClient handle, char* id, struct ParsedPayload ppayload, double temp, double pres);
+char* assembleTopic(char* sensorId, char* suffix);

@@ -3,9 +3,11 @@
 #include <string.h>
 #include "MQTTClient.h"
 #include "mqtt.h"
+#include "sensor.h"
 
 char receivedPayload[128];
 char message_received_flag;
+int variableSampleTime;
 
 void delivered(void *context, MQTTClient_deliveryToken dt)
 {
@@ -156,4 +158,52 @@ struct ParsedPayload parsePayload(char* payload)
     printf("Succesfully parsed message, funtion = %s value = %s\n", pPayload.function, pPayload.value);
 
     return pPayload;
+}
+
+int executeSubscribeFunction(MQTTClient handle, char* id, struct ParsedPayload ppayload, double temp, double pres)
+{
+    if (!strcmp(ppayload.function, "get")) {
+        if (!strcmp(ppayload.value, "temp")) {
+            char bufferStrTemp[sizeof(temp)];
+            sprintf(bufferStrTemp, "%.2f", temp);
+            publishMessage(handle, "sensor/get/", bufferStrTemp, id);
+            printf("Message published on topic sensor/get/ with payload %s\n", bufferStrTemp);
+        }
+        else if (!strcmp(ppayload.value, "pres")) {
+            char bufferStrPres[sizeof(pres)];
+            sprintf(bufferStrPres, "%.2f", pres);
+            publishMessage(handle, "sensor/get/", bufferStrPres, id);
+            printf("Message published on topic sensor/get/ with payload %s\n", bufferStrPres);
+        }
+        else {
+            publishMessage(handle, "sensor/get/", "Wrong Input", id);
+            printf("ERROR: function get was called but value was wrong.\n");
+        }
+        return 0;
+    }
+    else if (!strcmp(ppayload.function, "interval")) {
+        /* variableSampleTime has to to be more than 0.1s and less than 5min else goes to default value */
+        printf("Function 'interval' was called with payload %s\n", ppayload.value);
+        if (variableSampleTime >= 100000 && variableSampleTime <= 300000000) {
+            variableSampleTime = atoi(ppayload.value);
+        }
+        else {
+            printf("Changed sample time out of bounds [100000 - 300000000], resorting to default\n");
+            variableSampleTime = DEFAULT_SAMPLE_TIME;
+        }
+        return 0;
+    }
+    else {
+        printf("Function wasn't able to be deciphered\n");
+        return 1;
+    }
+}
+
+char* assembleTopic(char* sensorId, char* suffix)
+{
+    char* topic;
+    topic = (char*)malloc(strlen(sensorId) + strlen(suffix) + 1);
+	strcpy(topic, sensorId);
+	strcat(topic, suffix);
+    return topic;
 }
