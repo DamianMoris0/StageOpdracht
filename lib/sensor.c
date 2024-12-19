@@ -3,6 +3,7 @@
 #include "cJSON.h"
 #include <stdio.h>
 #include <time.h>
+#include <stdlib.h>
 
 int initSensor(void *sens, int type)
 {
@@ -15,9 +16,12 @@ int initSensor(void *sens, int type)
 		bmp180_eprom_t eprom;
 		bmp180_dump_eprom(sens, &eprom);
 		bmp180_set_oss(sens, 1);
+		printf("Sensor of type %s has been initialised\n", getSensorTypeName(type));
 	}
 	else {
 		printf("Sensor type not found\n");
+		//bmp180_close(sens);
+		//sens = NULL;
 		return 1;
 		/* Default to BMP180 sensor */
 		//bmp180_eprom_t eprom;
@@ -35,23 +39,26 @@ char* createJsonFromSensorData(struct SensorValues *sensVals)
     
     /* Add data from struct to JSON */
     if(sensVals->id != NULL) {
-		cJSON_AddStringToObject(json, "sensorID", sensVals->id);
+		cJSON_AddStringToObject(json, "sensorId", sensVals->id);
 	}
 	else {
-		cJSON_AddStringToObject(json, "sensorID", "?");
+		cJSON_AddStringToObject(json, "sensorId", "?");
 	}
+
 	if(sensVals->typeStr != NULL) {
 		cJSON_AddStringToObject(json, "sensorType",	sensVals->typeStr);
 	}
 	else {
 		cJSON_AddStringToObject(json, "sensorType",	"?");
 	}
+
     if(sensVals->time != NULL) {
 		cJSON_AddStringToObject(json, "timestamp", sensVals->time);
 	}
 	else {
 		cJSON_AddStringToObject(json, "timestamp", "?");
 	}
+	
 	cJSON_AddNumberToObject(json, "temperature", sensVals->temperature);
 	cJSON_AddNumberToObject(json, "pressure", sensVals->pressure);
 
