@@ -5,9 +5,10 @@
 void setUp(void) {}
 void tearDown(void) {}
 
+/* This test fails deliberately for demonstration purposes */
 void test_initSensor(void)
 {
-	/* Init test sensors */
+	/* Initialise test sensors */
 	void *testSensor1 = bmp180_init(0x77, "/dev/i2c-1");
 	void *testSensor2 = bmp180_init(0x36, "/dev/i2c-1");
 	void *testSensor3 = bmp180_init(0x77, "/fesgsdfeg");
@@ -18,9 +19,16 @@ void test_initSensor(void)
 	TEST_ASSERT_EQUAL_MESSAGE(0, initSensor(&testSensor1, BMP180), "Normal BMP180\n");
 	TEST_ASSERT_EQUAL_MESSAGE(0, initSensor(&testSensor2, BMP180), "Other sensor address\n");
 	TEST_ASSERT_EQUAL_MESSAGE(0, initSensor(&testSensor3, BMP180), "Wrong I2C path\n");
-
 	TEST_ASSERT_EQUAL_MESSAGE(0, initSensor(&testSensor4, BMP180), "Wrong sensor address and I2C path\n");
 	TEST_ASSERT_EQUAL_MESSAGE(0, initSensor(&testSensor5, 1),	   "Non existend sensor type\n");
+
+	/* Close test sensors */
+	bmp180_close(testSensor1);
+	bmp180_close(testSensor2);
+	bmp180_close(testSensor3);
+	bmp180_close(testSensor4);
+	bmp180_close(testSensor5);
+
 }
 
 void test_createJsonFromSensorData(void)
@@ -34,21 +42,21 @@ void test_createJsonFromSensorData(void)
 
 
 	/* Check it sensor values are correctly converted into the right json string */
-	TEST_ASSERT_EQUAL_STRING_MESSAGE("{\n\t\"sensorID\":\t\"Sensor_1\",\n\t\"sensorType\":\t\"BMP180\",\n\t\"timestamp\":\t\"13:01:24\",\n\t\"temperature\":\t21.3,\n\t\"pressure\":\t1009.6\n}",
+	TEST_ASSERT_EQUAL_STRING_MESSAGE("{\n\t\"sensorId\":\t\"Sensor_1\",\n\t\"sensorType\":\t\"BMP180\",\n\t\"timestamp\":\t\"13:01:24\",\n\t\"temperature\":\t21.3,\n\t\"pressure\":\t1009.6\n}",
 									 createJsonFromSensorData(&sensorData1), "Normal sensor data to json string conversion\n");
-	TEST_ASSERT_EQUAL_STRING_MESSAGE("{\n\t\"sensorID\":\t\"Sensor_2\",\n\t\"sensorType\":\t\"DEFAULT_SENSOR\",\n\t\"timestamp\":\t\"13:01:24\",\n\t\"temperature\":\t21.3,\n\t\"pressure\":\t1009.6\n}",
+	TEST_ASSERT_EQUAL_STRING_MESSAGE("{\n\t\"sensorId\":\t\"Sensor_2\",\n\t\"sensorType\":\t\"DEFAULT_SENSOR\",\n\t\"timestamp\":\t\"13:01:24\",\n\t\"temperature\":\t21.3,\n\t\"pressure\":\t1009.6\n}",
 									 createJsonFromSensorData(&sensorData2), "Normal sensor data to json string conversion\n");
-	TEST_ASSERT_EQUAL_STRING_MESSAGE("{\n\t\"sensorID\":\t\"Sensor_3\",\n\t\"sensorType\":\t\"BMP180\",\n\t\"timestamp\":\t\"?\",\n\t\"temperature\":\t0,\n\t\"pressure\":\t1009.6\n}",
+	TEST_ASSERT_EQUAL_STRING_MESSAGE("{\n\t\"sensorId\":\t\"Sensor_3\",\n\t\"sensorType\":\t\"BMP180\",\n\t\"timestamp\":\t\"?\",\n\t\"temperature\":\t0,\n\t\"pressure\":\t1009.6\n}",
 									 createJsonFromSensorData(&sensorData3), "No timestamp and temperature in sensor values\n");
-	TEST_ASSERT_EQUAL_STRING_MESSAGE("{\n\t\"sensorID\":\t\"Sensor_4\",\n\t\"sensorType\":\t\"?\",\n\t\"timestamp\":\t\"?\",\n\t\"temperature\":\t0,\n\t\"pressure\":\t0\n}",
+	TEST_ASSERT_EQUAL_STRING_MESSAGE("{\n\t\"sensorId\":\t\"Sensor_4\",\n\t\"sensorType\":\t\"?\",\n\t\"timestamp\":\t\"?\",\n\t\"temperature\":\t0,\n\t\"pressure\":\t0\n}",
 									 createJsonFromSensorData(&sensorData4), "No sensor type string, timestamp, temperature and pressure\n");
-	TEST_ASSERT_EQUAL_STRING_MESSAGE("{\n\t\"sensorID\":\t\"?\",\n\t\"sensorType\":\t\"?\",\n\t\"timestamp\":\t\"?\",\n\t\"temperature\":\t0,\n\t\"pressure\":\t0\n}",
+	TEST_ASSERT_EQUAL_STRING_MESSAGE("{\n\t\"sensorId\":\t\"?\",\n\t\"sensorType\":\t\"?\",\n\t\"timestamp\":\t\"?\",\n\t\"temperature\":\t0,\n\t\"pressure\":\t0\n}",
 									 createJsonFromSensorData(&sensorData5), "Empty struct\n");
 }
 
 void test_writeSensorDataToFile(void)
 {
-	/* more test stuff */
+	/* Function currently not in use */
 }
 
 void test_checkDataBounds(void)
