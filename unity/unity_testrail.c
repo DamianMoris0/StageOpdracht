@@ -11,10 +11,12 @@ void insertTestStatusToTestrail(struct UNITY_STORAGE_T unity, char* st)
     char* execState;
 
     struct Tests tests[] = {
+        /* test_sensor tests */
         {.testName = "test_checkDataBounds",            .caseId = 53234},
         {.testName = "test_initSensor",                 .caseId = 53235},
         {.testName = "test_createJsonFromSensorData",   .caseId = 53236},
         {.testName = "test_getSensorTypeName",          .caseId = 53237},
+        /* test_mqtt tests */
         {.testName = "test_configSSL",                  .caseId = 53240},
         {.testName = "test_connectBroker",              .caseId = 53241},
         {.testName = "test_publishMessage",             .caseId = 53242},
